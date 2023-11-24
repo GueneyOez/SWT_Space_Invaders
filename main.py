@@ -15,7 +15,7 @@ class Game:
         # draw all sprite groups
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     pygame.init()
     screen_width = 600
     screen_height = 600
