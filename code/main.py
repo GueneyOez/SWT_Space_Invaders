@@ -21,11 +21,11 @@ class Game:
                 y = row_index * y_distance + y_offset
 
                 if row_index == 0:
-                    alien_sprite = Alien("blue", x, y)
+                    alien_sprite = Alien("blue_alien", x, y)
                 elif 1 <= row_index <= 2:
-                    alien_sprite = Alien("red", x, y)
+                    alien_sprite = Alien("red_alien", x, y)
                 else:
-                    alien_sprite = Alien("yellow", x, y)
+                    alien_sprite = Alien("yellow_alien", x, y)
                 self.aliens.add(alien_sprite)
 
     def run(self):
