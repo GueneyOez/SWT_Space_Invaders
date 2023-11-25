@@ -1,8 +1,8 @@
 import pygame, sys
 from player import Player
 import obstacle
-from alien import Alien
-from random import choice
+from alien import Alien, Ufo
+from random import choice, randint
 from laser import Laser
 
 
@@ -30,6 +30,10 @@ class Game:
         self.alien_lasers = pygame.sprite.Group()
         self.alien_setup(rows=5, columns=8)
         self.alien_direction = 1
+
+        # Ufo setup
+        self.ufo = pygame.sprite.GroupSingle()
+        self.ufo_spawn_time = randint(400, 800)
 
     def create_obstacle(self, x_start, y_start, offset_x):
         for row_index, row in enumerate(self.shape):
@@ -65,10 +69,10 @@ class Game:
         for alien in all_aliens:
             if alien.rect.right >= screen_width:
                 self.alien_direction = -1
-                self.alien_move_down(2)
+                self.alien_move_down(1)
             elif alien.rect.left <= 0:
                 self.alien_direction = 1
-                self.alien_move_down(2)
+                self.alien_move_down(1)
 
     def alien_move_down(self, distance):
         if self.aliens:
@@ -81,6 +85,12 @@ class Game:
             laser_sprite = Laser(random_alien.rect.center, 6, screen_height)
             self.alien_lasers.add(laser_sprite)
 
+    def ufo_alien_timer(self):
+        self.ufo_spawn_time -= 1
+        if self.ufo_spawn_time <= 0:
+            self.ufo.add(Ufo(choice(["right", "left"]), screen_width))
+            self.ufo_spawn_time = randint(400, 800)
+
     def run(self):
         # update all sprite groups
         # draw all sprite groups
@@ -88,6 +98,8 @@ class Game:
         self.aliens.update(self.alien_direction)
         self.alien_position_checker()
         self.alien_lasers.update()
+        self.ufo_alien_timer()
+        self.ufo.update()
 
         self.player.sprite.lasers.draw(screen)
         self.player.draw(screen)
@@ -96,6 +108,7 @@ class Game:
 
         self.aliens.draw(screen)
         self.alien_lasers.draw(screen)
+        self.ufo.draw(screen)
 
 
 if __name__ == "__main__":
