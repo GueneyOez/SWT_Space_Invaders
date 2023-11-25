@@ -62,8 +62,15 @@ class Game:
         for alien in all_aliens:
             if alien.rect.right >= screen_width:
                 self.alien_direction = -1
+                self.alien_move_down(2)
             elif alien.rect.left <= 0:
                 self.alien_direction = 1
+                self.alien_move_down(2)
+
+    def alien_move_down(self, distance):
+        if self.aliens:
+            for alien in self.aliens.sprites():
+                alien.rect.y += distance
 
     def run(self):
         self.player.update()
