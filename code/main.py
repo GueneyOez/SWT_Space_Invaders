@@ -69,10 +69,10 @@ class Game:
         for alien in all_aliens:
             if alien.rect.right >= screen_width:
                 self.alien_direction = -1
-                self.alien_move_down(1)
+                self.alien_move_down(2)
             elif alien.rect.left <= 0:
                 self.alien_direction = 1
-                self.alien_move_down(1)
+                self.alien_move_down(2)
 
     def alien_move_down(self, distance):
         if self.aliens:
@@ -91,6 +91,43 @@ class Game:
             self.ufo.add(Ufo(choice(["right", "left"]), screen_width))
             self.ufo_spawn_time = randint(400, 800)
 
+    def collision_checks(self):
+        #  Player lasers
+        if self.player.sprite.lasers:
+            for laser in self.player.sprite.lasers:
+                # obstacle collisions
+                if pygame.sprite.spritecollide(laser, self.blocks, True):
+                    laser.kill()
+
+                # alien collisions
+                if pygame.sprite.spritecollide(laser, self.aliens, True):
+                    laser.kill()
+
+                # ufo collision
+                if pygame.sprite.spritecollide(laser, self.ufo, True):
+                    laser.kill()
+
+        # Alien lasers
+        if self.alien_lasers:
+            for laser in self.alien_lasers:
+                # obstacle collisions
+                if pygame.sprite.spritecollide(laser, self.blocks, True):
+                    laser.kill()
+
+                if pygame.sprite.spritecollide(laser, self.player, False):
+                    laser.kill()
+                    pygame.quit()
+                    sys.exit()
+
+        # Aliens
+        if self.aliens:
+            for alien in self.aliens:
+                pygame.sprite.spritecollide(alien, self.blocks, True)
+
+                if pygame.sprite.spritecollide(alien, self.player, False):
+                    pygame.quit()
+                    sys.exit()
+
     def run(self):
         # update all sprite groups
         # draw all sprite groups
@@ -100,6 +137,7 @@ class Game:
         self.alien_lasers.update()
         self.ufo_alien_timer()
         self.ufo.update()
+        self.collision_checks()
 
         self.player.sprite.lasers.draw(screen)
         self.player.draw(screen)
