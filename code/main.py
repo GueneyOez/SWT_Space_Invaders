@@ -15,7 +15,7 @@ class Game:
         # Health setup
         self.lives = 3
         self.live_surf = pygame.image.load("graphics/player.png").convert_alpha()
-        self.live_x_start_pos = screen_width - (self.live_surf.get_size()[0] * 2 + 20)
+        self.live_x_start_pos = screen_width - (self.live_surf.get_size()[0] * 3 + 30)
 
         # Score setup
         self.score = 0
@@ -144,8 +144,10 @@ class Game:
                     sys.exit()
 
     def display_lives(self):
-        for live in range(self.lives - 1):
-            x = self.live_x_start_pos + (live * (self.live_surf.get_size()[0] + 10))
+        for live in reversed(range(self.lives)):
+            x = self.live_x_start_pos + (
+                (2 - live) * (self.live_surf.get_size()[0] + 10)
+            )
             screen.blit(self.live_surf, (x, 8))
 
     def display_score(self):
