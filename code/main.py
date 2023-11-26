@@ -117,7 +117,7 @@ class Game:
 
                 # ufo collision
                 if pygame.sprite.spritecollide(laser, self.ufo, True):
-                    self.score += 500
+                    self.score += 50
                     laser.kill()
 
         # Alien lasers
@@ -161,6 +161,46 @@ class Game:
             )
             screen.blit(victory_surf, victory_rect)
 
+    def show_menu(self):
+        # Show title
+        title_text = pygame.font.Font("graphics/Pixeled.ttf", 40).render(
+            "SPACE INVADERS", True, (255, 255, 255)
+        )
+        title_rect = title_text.get_rect(center=(screen_width // 2, 100))
+        screen.blit(title_text, title_rect)
+
+        # Show instruction text
+        instruction_text = pygame.font.Font("graphics/Pixeled.ttf", 20).render(
+            "PRESS ANY KEY TO CONTINUE", True, (255, 255, 255)
+        )
+        instruction_rect = instruction_text.get_rect(center=(screen_width // 2, 150))
+        screen.blit(instruction_text, instruction_rect)
+
+        # Show enemy images and point values
+        enemy_images = [
+            pygame.image.load("graphics/yellow_alien.png").convert_alpha(),
+            pygame.image.load("graphics/red_alien.png").convert_alpha(),
+            pygame.image.load("graphics/blue_alien.png").convert_alpha(),
+            pygame.image.load("graphics/ufo.png").convert_alpha(),
+        ]
+
+        enemy_texts = [
+            ("= 10 PTS", (217, 255, 0)),
+            ("= 20 PTS", (255, 0, 106)),
+            ("= 30 PTS", (0, 183, 239)),
+            ("= ??? PTS", (38, 211, 239)),
+        ]
+
+        for i, (image, (text, color)) in enumerate(zip(enemy_images, enemy_texts)):
+            image_rect = image.get_rect(topleft=(200, 215 + i * 75))
+            screen.blit(image, image_rect)
+
+            enemy_text = pygame.font.Font("graphics/Pixeled.ttf", 20).render(
+                text, True, color
+            )
+            enemy_rect = enemy_text.get_rect(topleft=(255, 200 + i * 75))
+            screen.blit(enemy_text, enemy_rect)
+
     def run(self):
         # update all sprite groups
         # draw all sprite groups
@@ -193,19 +233,26 @@ if __name__ == "__main__":
     clock = pygame.time.Clock()
     game = Game()
 
-    ALIENLASER = pygame.USEREVENT + 1
-    pygame.time.set_timer(ALIENLASER, 800)
+    ALIEN_LASER_EVENT = pygame.USEREVENT + 1
+    pygame.time.set_timer(ALIEN_LASER_EVENT, 800)
 
+    in_menu = True
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-            if event.type == ALIENLASER:
+            elif event.type == pygame.KEYDOWN and in_menu:
+                in_menu = False
+            elif event.type == ALIEN_LASER_EVENT and not in_menu:
                 game.alien_shoot()
 
         screen.fill((30, 30, 30))
-        game.run()
+
+        if in_menu:
+            game.show_menu()
+        else:
+            game.run()
 
         pygame.display.flip()
         clock.tick(60)
