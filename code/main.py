@@ -25,13 +25,13 @@ class Game:
         self.shape = obstacle.shape
         self.block_size = 6
         self.blocks = pygame.sprite.Group()
-        self.obstacle_amount = 3
+        self.obstacle_amount = 4
         self.obstacle_x_positions = [
             num * (screen_width / self.obstacle_amount)
             for num in range(self.obstacle_amount)
         ]
         self.create_multiple_obstacles(
-            *self.obstacle_x_positions, x_start=screen_width / 11, y_start=480
+            *self.obstacle_x_positions, x_start=screen_width / 18, y_start=480
         )
 
         # Alien setup
