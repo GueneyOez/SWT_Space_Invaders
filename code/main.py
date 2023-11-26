@@ -12,17 +12,22 @@ class Game:
         player_sprite = Player((screen_width / 2, screen_height), screen_width, 5)
         self.player = pygame.sprite.GroupSingle(player_sprite)
 
+        # health and score setup
+        self.lives = 3
+        self.live_surf = pygame.image.load("graphics/player.png").convert_alpha()
+        self.live_x_start_pos = screen_width - (self.live_surf.get_size()[0] * 2 + 20)
+
         # Obstacle setup
         self.shape = obstacle.shape
         self.block_size = 6
         self.blocks = pygame.sprite.Group()
-        self.obstacle_amount = 4
+        self.obstacle_amount = 3
         self.obstacle_x_positions = [
             num * (screen_width / self.obstacle_amount)
             for num in range(self.obstacle_amount)
         ]
         self.create_multiple_obstacles(
-            *self.obstacle_x_positions, x_start=screen_width / 20, y_start=480
+            *self.obstacle_x_positions, x_start=screen_width / 11, y_start=480
         )
 
         # Alien setup
@@ -116,8 +121,10 @@ class Game:
 
                 if pygame.sprite.spritecollide(laser, self.player, False):
                     laser.kill()
-                    pygame.quit()
-                    sys.exit()
+                    self.lives -= 1
+                    if self.lives <= 0:
+                        pygame.quit()
+                        sys.exit()
 
         # Aliens
         if self.aliens:
@@ -127,6 +134,11 @@ class Game:
                 if pygame.sprite.spritecollide(alien, self.player, False):
                     pygame.quit()
                     sys.exit()
+
+    def display_lives(self):
+        for live in range(self.lives - 1):
+            x = self.live_x_start_pos + (live * (self.live_surf.get_size()[0] + 10))
+            screen.blit(self.live_surf, (x, 8))
 
     def run(self):
         # update all sprite groups
@@ -138,6 +150,7 @@ class Game:
         self.ufo_alien_timer()
         self.ufo.update()
         self.collision_checks()
+        self.display_lives()
 
         self.player.sprite.lasers.draw(screen)
         self.player.draw(screen)
