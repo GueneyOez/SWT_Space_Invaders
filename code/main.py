@@ -12,10 +12,14 @@ class Game:
         player_sprite = Player((screen_width / 2, screen_height), screen_width, 5)
         self.player = pygame.sprite.GroupSingle(player_sprite)
 
-        # health and score setup
+        # Health setup
         self.lives = 3
         self.live_surf = pygame.image.load("graphics/player.png").convert_alpha()
         self.live_x_start_pos = screen_width - (self.live_surf.get_size()[0] * 2 + 20)
+
+        # Score setup
+        self.score = 0
+        self.font = pygame.font.Font("graphics/Pixeled.ttf", 20)
 
         # Obstacle setup
         self.shape = obstacle.shape
@@ -105,11 +109,15 @@ class Game:
                     laser.kill()
 
                 # alien collisions
-                if pygame.sprite.spritecollide(laser, self.aliens, True):
+                aliens_hit = pygame.sprite.spritecollide(laser, self.aliens, True)
+                if aliens_hit:
+                    for alien in aliens_hit:
+                        self.score += alien.value
                     laser.kill()
 
                 # ufo collision
                 if pygame.sprite.spritecollide(laser, self.ufo, True):
+                    self.score += 500
                     laser.kill()
 
         # Alien lasers
@@ -140,23 +148,37 @@ class Game:
             x = self.live_x_start_pos + (live * (self.live_surf.get_size()[0] + 10))
             screen.blit(self.live_surf, (x, 8))
 
+    def display_score(self):
+        score_surf = self.font.render(f"score: {self.score}", False, "white")
+        score_rect = score_surf.get_rect(topleft=(10, -10))
+        screen.blit(score_surf, score_rect)
+
+    def display_victory_message(self):
+        if not self.aliens.sprites():
+            victory_surf = self.font.render("You won", False, "white")
+            victory_rect = victory_surf.get_rect(
+                center=(screen_width / 2, screen_height / 2)
+            )
+            screen.blit(victory_surf, victory_rect)
+
     def run(self):
         # update all sprite groups
         # draw all sprite groups
         self.player.update()
         self.aliens.update(self.alien_direction)
-        self.alien_position_checker()
         self.alien_lasers.update()
-        self.ufo_alien_timer()
         self.ufo.update()
+
+        self.alien_position_checker()
+        self.ufo_alien_timer()
         self.collision_checks()
         self.display_lives()
+        self.display_score()
+        self.display_victory_message()
 
         self.player.sprite.lasers.draw(screen)
         self.player.draw(screen)
-
         self.blocks.draw(screen)
-
         self.aliens.draw(screen)
         self.alien_lasers.draw(screen)
         self.ufo.draw(screen)
